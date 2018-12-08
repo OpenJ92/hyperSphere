@@ -30,11 +30,23 @@ def hyperSphere(theta):
         _ = c(_, i)
     return _
 
+def hyperSphereProduct(hS_A, hS_B):
+    c = np.outer(hS_A, hS_B)
+    # Check to see exactly how np.outer works. How exactly are the elements itterated through?
+    # This definition of the product is supposed to be reminisent of the polynomial product where each
+    # element of the vector corresponds to x**n
+    q = np.zeros(shape = ((hS_A.shape[0]*hS_B.shape[0]) - ((hS_A.shape[0] - 1)*(hS_B.shape[0] - 1))))
+    for i in range(0, hS_A.shape[0]):
+        for j in range(0, hS_B.shape[0]):
+            q[i+j] += c[i][j]
+    return q
+
 def hyperSphereTest(dimension, numTests):
     for i in range(0, numTests):
         sample = 2 * np.pi * np.random.random_sample(size = dimension)
         hS = hyperSphere(sample)
-        plt.scatter(i, np.linalg.norm(hyperSphere(sample)))
+        plt.scatter(i, np.linalg.norm(hS))
+        print(hS, np.linalg.norm(hS))
     plt.show()
 
 def hyperSpherePoly(dimension, numTests):
