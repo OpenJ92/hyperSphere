@@ -19,10 +19,10 @@ c = lambda x, theta: np.append(np.cos(theta)*x, np.sin(theta))
 ## |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 ##
 ##      examples:
-##          hyperSphere([np.pi]) ~= [1,0]
-##          hyperSphere([np.pi, 0]) ~= [1,0,0]
-##          hyperSphere([0,0,0,0, ...,0]) ~= [1,0,0,0, ...,0]
-##          hyperSphere([0,0,0,0, ...,0]) ~= [0,0,0,0, ...,1]
+##          hyperSphere([np.pi]) ~= array([-1.0000000e+00,  1.2246468e-16])
+##          hyperSphere([np.pi, 0]) ~= array([-1.0000000e+00,  1.2246468e-16,  0.0000000e+00])
+##          hyperSphere([np.pi, 0, np.pi/2, np.pi/6]) ~= array([-5.30287619e-17,  6.49415036e-33,  0.00000000e+00,  8.66025404e-01,5.00000000e-01])
+##          hyperSphere([np.pi, np.pi/2, np.pi/3, np.pi/4, np.pi/5]) ~= array([-1.75143291e-17,  2.14488671e-33,  2.86030701e-01,  4.95419707e-01,  5.72061403e-01,  5.87785252e-01])
 
 def hyperSphere(theta):
     _ = c(1, theta[0])
@@ -32,14 +32,14 @@ def hyperSphere(theta):
 
 def hyperSphereTest(dimension, numTests):
     for i in range(0, numTests):
-        sample = np.pi * np.random.random_sample(size = dimension)
+        sample = 2 * np.pi * np.random.random_sample(size = dimension)
         hS = hyperSphere(sample)
         plt.scatter(i, np.linalg.norm(hyperSphere(sample)))
     plt.show()
 
 def hyperSpherePoly(dimension, numTests):
     for i in range(0, numTests):
-        sample = 2*np.pi*np.random.random_sample(size = dimension)
+        sample = 2 * np.pi * np.random.random_sample(size = dimension)
         hS = hyperSphere(sample)
         plt.plot(np.linspace(-1,1,500),sigma(np.linspace(-10,10,500),hS))
     plt.show()
