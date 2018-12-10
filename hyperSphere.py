@@ -6,12 +6,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from functools import reduce
 
-sigma = lambda x, parameters: reduce((lambda y, z: y + z), [parameters[i]*(x**i) for i in range(0, len(parameters))])
-c = lambda x, theta: np.append(np.cos(theta)*x, np.sin(theta))
-
 ## hyperSphere(theta)
 ##      input:
-##          theta - (itterable) (float) of arbitrary length
+##          theta - [float, float, float, ..., float]
 ##
 ##      output:
 ##          np.array() | norm(np.array) ~= 1
@@ -24,22 +21,37 @@ c = lambda x, theta: np.append(np.cos(theta)*x, np.sin(theta))
 ##          hyperSphere([np.pi, 0, np.pi/2, np.pi/6]) ~= array([-5.30287619e-17,  6.49415036e-33,  0.00000000e+00,  8.66025404e-01,5.00000000e-01])
 ##          hyperSphere([np.pi, np.pi/2, np.pi/3, np.pi/4, np.pi/5]) ~= array([-1.75143291e-17,  2.14488671e-33,  2.86030701e-01,  4.95419707e-01,  5.72061403e-01,  5.87785252e-01])
 
+## hyperSphereProduct_M(theta)
+##        input:
+##             theta - [[float], [float, float], [float, float], ..., [float, float]]
+##
+##        output:
+##              np.array() |
+##
+## |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+##
+##      examples:
+##          (make some example calls here.)
+
+c = lambda x, theta: np.append(np.cos(theta)*x, np.sin(theta))
+
 def hyperSphere(theta):
     _ = c(1, theta[0])
     for i in theta[1:]:
         _ = c(_, i)
     return _
 
-def hyperSphereProduct(hS_A, hS_B):
-    c = np.outer(hS_A, hS_B)
-    # Check to see exactly how np.outer works. How exactly are the elements itterated through?
-    # This definition of the product is supposed to be reminisent of the polynomial product where each
-    # element of the vector corresponds to x**n
-    q = np.zeros(shape = ((hS_A.shape[0]*hS_B.shape[0]) - ((hS_A.shape[0] - 1)*(hS_B.shape[0] - 1))))
-    for i in range(0, hS_A.shape[0]):
-        for j in range(0, hS_B.shape[0]):
+def Binary_hyperSphereProduct(_A, _B):
+    c = np.outer(_A, _B)
+    q = np.zeros(shape = ((_A.shape[0]*_B.shape[0]) - ((_A.shape[0] - 1)*(_B.shape[0] - 1))))
+    for i in range(0, _A.shape[0]):
+        for j in range(0, _B.shape[0]):
             q[i+j] += c[i][j]
     return q
+
+def hyperSphereProduct(theta):
+    input_ = [hyperSphere(domain) for domain in theta]
+    return reduce((lambda x, y: Binary_hyperSphereProduct(x, y)), input_)
 
 def hyperSphereTest(dimension, numTests):
     for i in range(0, numTests):
@@ -48,6 +60,8 @@ def hyperSphereTest(dimension, numTests):
         plt.scatter(i, np.linalg.norm(hS))
         print(hS, np.linalg.norm(hS))
     plt.show()
+
+sigma = lambda x, parameters: reduce((lambda y, z: y + z), [parameters[i]*(x**i) for i in range(0, len(parameters))])
 
 def hyperSpherePoly(dimension, numTests):
     for i in range(0, numTests):
