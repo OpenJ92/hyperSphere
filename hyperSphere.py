@@ -53,6 +53,28 @@ def hyperSphereProduct(theta):
     input_ = [hyperSphere(domain) for domain in theta]
     return reduce((lambda x, y: Binary_hyperSphereProduct(x, y)), input_)
 
+def proveFTA(hyperSphereProduct_):
+    initial_Domain_Sample = np.random.random_sample(size = len(hyperSphereProduct_) - 1)
+    hyperSphere_ = hyperSphere(initial_Domain_Sample)
+    #inner_product_Loss = 1 - np.absolute(hyperSphereProduct_*(1/np.linalg.norm(hyperSphereProduct_)) @ hyperSphere_)
+    #a sample of random vectors belonging to the hyperSphere in desired dimension.
+
+    # make a sphere around the sampled initial_Domain_Sample
+    # resolve hyperSphere(initial_Domain_Sample + sphere_initial_Domain_Sample)
+    # resolve argmax(1 - (hyperSphereProduct_ @ hyperSphere(initial_Domain_Sample + sphere_initial_Domain_Sample)))
+    #           where arg == sphere_initial_Domain_Sample
+    # Then change initial_Domain_Sample to the argmax resolition of above.
+    # repeat process until we've reached below some threshold.
+
+    # Currently, this function has the opperations nessesary to carry out the above process. Look to implement
+    # the above process when you get back to brooklyn.
+
+    sample_about_Domain_Sample = np.apply_along_axis(hyperSphere, 1, 2 * np.pi * np.random.random_sample(size = (1000, len(hyperSphereProduct_) - 1)))
+    resolved_samples = np.apply_along_axis((lambda x: x + hyperSphere_), 1, sample_about_Domain_Sample)
+    import pdb; pdb.set_trace()
+
+    #learning_hyperSphere_ = learning_rate * (uniform_random_sample from )D
+
 def hyperSphereTest(dimension, numTests):
     for i in range(0, numTests):
         sample = 2 * np.pi * np.random.random_sample(size = dimension)
