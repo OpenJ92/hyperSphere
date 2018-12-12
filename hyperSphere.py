@@ -70,6 +70,9 @@ def proveFTA(hyperSphereProduct_, num_samples, learning_rate):
     B = A @ hyperSphereProduct_
     C = np.argmax(B)
 
+    D = B[C]
+
+
     import pdb; pdb.set_trace()
     # continue work on this tomorrow. Think how you might apply this function to a sample of hyperSphereProduct_
 
