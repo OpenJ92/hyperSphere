@@ -53,9 +53,42 @@ def hyperSphereProduct(theta):
     input_ = [hyperSphere(domain) for domain in theta]
     return reduce((lambda x, y: Binary_hyperSphereProduct(x, y)), input_)
 
-def proveFTA(hyperSphereProduct_):
-    initial_Domain_Sample = np.random.random_sample(size = len(hyperSphereProduct_) - 1)
-    hyperSphere_ = hyperSphere(initial_Domain_Sample)
+def proveFTA(hyperSphereProduct_, num_samples, learning_rate):
+
+    hyperSphereProduct_ = (1 / np.linalg.norm(hyperSphereProduct_)) * hyperSphereProduct_
+
+    domain_Sample = 2 * np.pi * np.random.random_sample(size = (num_samples, len(hyperSphereProduct_) - 1))
+    hyperSphere_Sample = np.apply_along_axis(hyperSphere, 1, domain_Sample)
+
+    innerProduct = hyperSphere_Sample @ hyperSphereProduct_
+    argmaxinnerProduct = domain_Sample[np.argmax(innerProduct)]
+
+    subDomain_sample = np.random.random_sample(size = (num_samples, len(hyperSphereProduct_) - 2))
+    domain_hyperSphere_Sample_local = learning_rate * np.apply_along_axis(hyperSphere, 1, subDomain_sample)
+    domain_hyperSphere_Sample_global = np.apply_along_axis((lambda x: x + argmaxinnerProduct), 1, domain_hyperSphere_Sample_local)
+    A = np.apply_along_axis(hyperSphere, 1, domain_hyperSphere_Sample_global)
+    B = A @ hyperSphereProduct_
+    C = np.argmax(B)
+
+    import pdb; pdb.set_trace()
+    # continue work on this tomorrow. Think how you might apply this function to a sample of hyperSphereProduct_
+
+    # initial_Domain_Sample = np.random.random_sample(size = len(hyperSphereProduct_) - 1)
+    # hyperSphere_ = hyperSphere(initial_Domain_Sample)
+    # uniform_Domain_Sample = 2 * np.pi * np.random.random_sample(size = (num_samples, len(hyperSphere_) - 1))
+    # local_neighborhood_hyperSphere = learning_rate * np.apply_along_axis(hyperSphere, 1, uniform_Domain_Sample)
+    # global_neighborhood_hyperSphere = np.apply_along_axis((lambda x: x + hyperSphere_), 1, local_neighborhood_hyperSphere)
+    # A = (gloabal_neighborhood_hyperSphere @ hyperSphereProduct_)
+    # import pdb; pdb.set_trace()
+    # hyperSphere_ = hyperSphere(uniform_Domain_Sample[A.argmax()])
+
+    # consider again --
+    # 1. Draw a uniform random sample from [0, 2 * np.pi) as a matrix(size = (len(hyperSphereProduct_) - 1, numSamples))
+    # 2. Apply hyperSphere function along axis 1 to matrix
+    # 3. take inner product with matrix with hyperSphereProduct_ -- matrix @ hyperSphereProduct_
+
+    # make a hypersphere in the domain.  That is, initial_Domain_Sample + hyperSphere_ generated from uniform random subDomain
+
     #inner_product_Loss = 1 - np.absolute(hyperSphereProduct_*(1/np.linalg.norm(hyperSphereProduct_)) @ hyperSphere_)
     #a sample of random vectors belonging to the hyperSphere in desired dimension.
 
@@ -66,14 +99,9 @@ def proveFTA(hyperSphereProduct_):
     # Then change initial_Domain_Sample to the argmax resolition of above.
     # repeat process until we've reached below some threshold.
 
-    # Currently, this function has the opperations nessesary to carry out the above process. Look to implement
-    # the above process when you get back to brooklyn.
-
-    sample_about_Domain_Sample = np.apply_along_axis(hyperSphere, 1, 2 * np.pi * np.random.random_sample(size = (1000, len(hyperSphereProduct_) - 1)))
-    resolved_samples = np.apply_along_axis((lambda x: x + hyperSphere_), 1, sample_about_Domain_Sample)
-    import pdb; pdb.set_trace()
-
-    #learning_hyperSphere_ = learning_rate * (uniform_random_sample from )D
+    # sample_about_Domain_Sample = np.apply_along_axis(hyperSphere, 1, 2 * np.pi * np.random.random_sample(size = (1000, len(hyperSphereProduct_) - 1)))
+    # resolved_samples = np.apply_along_axis((lambda x: x + hyperSphere_), 1, sample_about_Domain_Sample)
+    # import pdb; pdb.set_trace()
 
 def hyperSphereTest(dimension, numTests):
     for i in range(0, numTests):
