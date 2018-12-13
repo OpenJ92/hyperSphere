@@ -65,14 +65,14 @@ def q(hyperSphereProduct_, num_samples, learning_rate):
 
     w = 1
     while(0 < 1):
-        subDomain_sample = np.random.random_sample(size = (1000, len(hyperSphereProduct_) - 2)) # Simmilar to domain_Sample
-        domain_hyperSphere_Sample_local = learning_rate * np.apply_along_axis(hyperSphere, 1, subDomain_sample) # Simmilar to hyperSphere_Sample
+        subDomain_sample = np.random.random_sample(size = (1000, len(hyperSphereProduct_) - 2))
+        domain_hyperSphere_Sample_local = learning_rate * np.apply_along_axis(hyperSphere, 1, subDomain_sample)
         domain_hyperSphere_Sample_local = np.apply_along_axis((lambda x: np.random.random_sample() * x), 1, domain_hyperSphere_Sample_local)
-        domain_hyperSphere_Sample_global = np.apply_along_axis((lambda x: x + argmaxinnerProduct), 1, domain_hyperSphere_Sample_local) # Simmilar to domain_Sample
-        A = np.apply_along_axis(hyperSphere, 1, domain_hyperSphere_Sample_global) # simmilar to hyperSphere_Sample
-        B = A @ hyperSphereProduct_ # Simmilar to innerProduct
+        domain_hyperSphere_Sample_global = np.apply_along_axis((lambda x: x + argmaxinnerProduct), 1, domain_hyperSphere_Sample_local)
+        A = np.apply_along_axis(hyperSphere, 1, domain_hyperSphere_Sample_global)
+        B = A @ hyperSphereProduct_
         if (hyperSphere(argmaxinnerProduct) @ hyperSphereProduct_) < B[np.argmax(B)]:
-            argmaxinnerProduct = domain_hyperSphere_Sample_global[np.argmax(B)] # Simmilar to argmaxinnerProduct
+            argmaxinnerProduct = domain_hyperSphere_Sample_global[np.argmax(B)]
             print('Increase found! -- Change current domain vector ----------------------------------------------------------------------')
             print(hyperSphere(argmaxinnerProduct) @ hyperSphereProduct_,learning_rate, w)
             print(hyperSphere(argmaxinnerProduct), np.linalg.norm(hyperSphere(argmaxinnerProduct)))
@@ -80,7 +80,6 @@ def q(hyperSphereProduct_, num_samples, learning_rate):
             w = 0
         else:
             w += 1
-            #learning_rate -= .0001
             print('Increase not found! -- Dont change current domain vector and resample')
             print(hyperSphere(argmaxinnerProduct) @ hyperSphereProduct_,learning_rate, w)
             print(hyperSphere(argmaxinnerProduct), np.linalg.norm(hyperSphere(argmaxinnerProduct)))
