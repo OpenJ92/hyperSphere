@@ -63,10 +63,11 @@ def q(hyperSphereProduct_, num_samples, learning_rate):
     innerProduct = hyperSphere_Sample @ hyperSphereProduct_
     argmaxinnerProduct = domain_Sample[np.argmax(innerProduct)]
 
-    w = 0
+    w = 1
     while(0 < 1):
         subDomain_sample = np.random.random_sample(size = (1000, len(hyperSphereProduct_) - 2)) # Simmilar to domain_Sample
         domain_hyperSphere_Sample_local = learning_rate * np.apply_along_axis(hyperSphere, 1, subDomain_sample) # Simmilar to hyperSphere_Sample
+        domain_hyperSphere_Sample_local = np.apply_along_axis((lambda x: np.random.random_sample() * x), 1, domain_hyperSphere_Sample_local)
         domain_hyperSphere_Sample_global = np.apply_along_axis((lambda x: x + argmaxinnerProduct), 1, domain_hyperSphere_Sample_local) # Simmilar to domain_Sample
         A = np.apply_along_axis(hyperSphere, 1, domain_hyperSphere_Sample_global) # simmilar to hyperSphere_Sample
         B = A @ hyperSphereProduct_ # Simmilar to innerProduct
@@ -74,19 +75,21 @@ def q(hyperSphereProduct_, num_samples, learning_rate):
             argmaxinnerProduct = domain_hyperSphere_Sample_global[np.argmax(B)] # Simmilar to argmaxinnerProduct
             print('Increase found! -- Change current domain vector ----------------------------------------------------------------------')
             print(hyperSphere(argmaxinnerProduct) @ hyperSphereProduct_,learning_rate, w)
-            print(hyperSphere(argmaxinnerProduct))
-            print(hyperSphereProduct_)
+            print(hyperSphere(argmaxinnerProduct), np.linalg.norm(hyperSphere(argmaxinnerProduct)))
+            print(hyperSphereProduct_, np.linalg.norm(hyperSphereProduct_))
             w = 0
         else:
             w += 1
             #learning_rate -= .0001
             print('Increase not found! -- Dont change current domain vector and resample')
             print(hyperSphere(argmaxinnerProduct) @ hyperSphereProduct_,learning_rate, w)
-            print(hyperSphere(argmaxinnerProduct))
-            print(hyperSphereProduct_)
+            print(hyperSphere(argmaxinnerProduct), np.linalg.norm(hyperSphere(argmaxinnerProduct)))
+            print(hyperSphereProduct_, np.linalg.norm(hyperSphereProduct_))
             if w > 100:
-                return hyperSphere(argmaxinnerProduct), argmaxinnerProduct
+                return hyperSphere(argmaxinnerProduct), hyperSphereProduct_
 
+def p():
+    pass
 # test
 # q(hyperSphereProduct([np.pi*2*np.random.random_sample(size = (1,)), np.pi*2*np.random.random_sample(size = (2,)), np.pi*2*np.random.random_sample(size = (1,))]), 10000, .05)
 
