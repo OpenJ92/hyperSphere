@@ -53,8 +53,21 @@ def hyperSphereProduct(theta):
     input_ = [hyperSphere(domain) for domain in theta]
     return reduce((lambda x, y: Binary_hyperSphereProduct(x, y)), input_)
 
+def L(Domain_):
+    hyperSphereProductDomain_ = [[Domain_[element], Domain_[element + 1]]for element in 2 * np.array(range(0, int(len(Domain_) / 2)))]
+    if len(Domain_) % 2 == 1:
+        hyperSphereProductDomain_.insert(0, [Domain_[-1]])
+    return hyperSphereProductDomain_
+
+
 def q(hyperSphereProductDomain_, num_samples, learning_rate):
     import pdb; pdb.set_trace()
+    # forming the above hyperSphereProductDomain_ is not easy given in the input
+    # above, The function L(Domain_) works to fix this so that one can generate a
+    # matrix np.random.random_sample(size = (1.000.000, dimension)) and apply along the
+    # first axis our q function. ie:
+    #           np.apply_along_axis(q, 1, np.random.random_sample(size = (1.000.000, dimension)), num_samples, learning_rate)
+    #              **Look into how one applies additional arguments in np.apply_along_axis
     hyperSphereProduct_ = hyperSphereProduct(hyperSphereProductDomain_)
     hyperSphereProduct_ = (1 / np.linalg.norm(hyperSphereProduct_)) * hyperSphereProduct_
 
@@ -88,10 +101,14 @@ def q(hyperSphereProductDomain_, num_samples, learning_rate):
             if w > 100:
                 return [hyperSphereProduct_, hyperSphereProductDomain_], [argmaxinnerProduct, hyperSphere(argmaxinnerProduct)]
 
-def p(hyperSphere_):
-    pass
-# test
-# q(hyperSphereProduct([np.pi*2*np.random.random_sample(size = (1,)), np.pi*2*np.random.random_sample(size = (2,)), np.pi*2*np.random.random_sample(size = (1,))]), 10000, .05)
+q([np.pi*2*np.random.random_sample(size = (1,)), np.pi*2*np.random.random_sample(size = (2,)), np.pi*2*np.random.random_sample(size = (1,))], 10000, .05)
+
+def p(Domain_):
+    #if len(Domain_) % 2 == 0:
+    hyperSphereProductDomain_ = [[Domain_[element], Domain_[element + 1]]for element in 2 * np.array(range(0, int(len(Domain_) / 2)))]
+    if len(Domain_) % 2 == 1:
+        hyperSphereProductDomain_.insert(0, [Domain_[-1]])
+    import pdb; pdb.set_trace()
 
 def hyperSphereTest(dimension, numTests):
     for i in range(0, numTests):
