@@ -53,8 +53,9 @@ def hyperSphereProduct(theta):
     input_ = [hyperSphere(domain) for domain in theta]
     return reduce((lambda x, y: Binary_hyperSphereProduct(x, y)), input_)
 
-def q(hyperSphereProduct_, num_samples, learning_rate):
-
+def q(hyperSphereProductDomain_, num_samples, learning_rate):
+    import pdb; pdb.set_trace()
+    hyperSphereProduct_ = hyperSphereProduct(hyperSphereProductDomain_)
     hyperSphereProduct_ = (1 / np.linalg.norm(hyperSphereProduct_)) * hyperSphereProduct_
 
     domain_Sample = 2 * np.pi * np.random.random_sample(size = (num_samples, len(hyperSphereProduct_) - 1))
@@ -85,9 +86,9 @@ def q(hyperSphereProduct_, num_samples, learning_rate):
             print(hyperSphere(argmaxinnerProduct), np.linalg.norm(hyperSphere(argmaxinnerProduct)))
             print(hyperSphereProduct_, np.linalg.norm(hyperSphereProduct_))
             if w > 100:
-                return hyperSphere(argmaxinnerProduct), hyperSphereProduct_
+                return [hyperSphereProduct_, hyperSphereProductDomain_], [argmaxinnerProduct, hyperSphere(argmaxinnerProduct)]
 
-def p():
+def p(hyperSphere_):
     pass
 # test
 # q(hyperSphereProduct([np.pi*2*np.random.random_sample(size = (1,)), np.pi*2*np.random.random_sample(size = (2,)), np.pi*2*np.random.random_sample(size = (1,))]), 10000, .05)
