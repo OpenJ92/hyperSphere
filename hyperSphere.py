@@ -54,14 +54,16 @@ def hyperSphereProduct(theta):
     return reduce((lambda x, y: Binary_hyperSphereProduct(x, y)), input_)
 
 def L(Domain_):
+    if len(Domain_) == 2:
+        return np.array([Domain_[0]], [Domain_[1]])
     hyperSphereProductDomain_ = [[Domain_[element], Domain_[element + 1]]for element in 2 * np.array(range(0, int(len(Domain_) / 2)))]
     if len(Domain_) % 2 == 1:
         hyperSphereProductDomain_.insert(0, [Domain_[-1]])
     return hyperSphereProductDomain_
 
 
-def q(hyperSphereProductDomain_, num_samples, learning_rate):
-    import pdb; pdb.set_trace()
+def q(hyperSphereProductDomain_, num_samples = 10000, learning_rate = .01):
+    # import pdb; pdb.set_trace()
     # forming the above hyperSphereProductDomain_ is not easy given in the input
     # above, The function L(Domain_) works to fix this so that one can generate a
     # matrix np.random.random_sample(size = (1.000.000, dimension)) and apply along the
@@ -79,7 +81,7 @@ def q(hyperSphereProductDomain_, num_samples, learning_rate):
 
     w = 1
     while(0 < 1):
-        subDomain_sample = np.random.random_sample(size = (1000, len(hyperSphereProduct_) - 2))
+        subDomain_sample = np.random.random_sample(size = (5000, len(hyperSphereProduct_) - 2))
         domain_hyperSphere_Sample_local = learning_rate * np.apply_along_axis(hyperSphere, 1, subDomain_sample)
         domain_hyperSphere_Sample_local = np.apply_along_axis((lambda x: np.random.random_sample() * x), 1, domain_hyperSphere_Sample_local)
         domain_hyperSphere_Sample_global = np.apply_along_axis((lambda x: x + argmaxinnerProduct), 1, domain_hyperSphere_Sample_local)
@@ -87,21 +89,19 @@ def q(hyperSphereProductDomain_, num_samples, learning_rate):
         B = A @ hyperSphereProduct_
         if (hyperSphere(argmaxinnerProduct) @ hyperSphereProduct_) < B[np.argmax(B)]:
             argmaxinnerProduct = domain_hyperSphere_Sample_global[np.argmax(B)]
-            print('Increase found! -- Change current domain vector ----------------------------------------------------------------------')
-            print(hyperSphere(argmaxinnerProduct) @ hyperSphereProduct_,learning_rate, w)
-            print(hyperSphere(argmaxinnerProduct), np.linalg.norm(hyperSphere(argmaxinnerProduct)))
-            print(hyperSphereProduct_, np.linalg.norm(hyperSphereProduct_))
             w = 0
         else:
             w += 1
-            print('Increase not found! -- Dont change current domain vector and resample')
-            print(hyperSphere(argmaxinnerProduct) @ hyperSphereProduct_,learning_rate, w)
-            print(hyperSphere(argmaxinnerProduct), np.linalg.norm(hyperSphere(argmaxinnerProduct)))
-            print(hyperSphereProduct_, np.linalg.norm(hyperSphereProduct_))
-            if w > 100:
-                return [hyperSphereProduct_, hyperSphereProductDomain_], [argmaxinnerProduct, hyperSphere(argmaxinnerProduct)]
+            if w >= 10:
+                return hyperSphereProduct_, hyperSphereProductDomain_, argmaxinnerProduct, hyperSphere(argmaxinnerProduct), hyperSphere(argmaxinnerProduct) @ hyperSphereProduct_,learning_rate
 
-q([np.pi*2*np.random.random_sample(size = (1,)), np.pi*2*np.random.random_sample(size = (2,)), np.pi*2*np.random.random_sample(size = (1,))], 10000, .05)
+def testq(num_, dimension_):
+    samp = np.random.random_sample(size = (num_, dimension_))
+    samp_A = np.apply_along_axis(L, 1, samp)
+    samp_B = np.apply_along_axis(q, 1, samp_A)
+    return samp_B
+
+# q([np.pi*2*np.random.random_sample(size = (1,)), np.pi*2*np.random.random_sample(size = (2,)), np.pi*2*np.random.random_sample(size = (1,))], 10000, .05)
 
 def p(Domain_):
     #if len(Domain_) % 2 == 0:
