@@ -9,7 +9,6 @@ L = lambda x, c, pow: (x**pow) + c
 L_con = lambda x: True if np.absolute(x) < 2 else False
 
 def r_Func(x, c, pow, func = L, con_func = L_con, count = 0):
-    #import pdb; pdb.set_trace()
     func_val = func(x, c, pow)
     if (con_func(func_val)) and (count < 500):
         count += 1
@@ -28,20 +27,19 @@ def r_func(_, _con, _param, _con_param, count):
     else:
         return count
 
-
-sample = ((4*np.random.random_sample(size = (100000,))) - 2) + ((4 * 1j * np.random.random_sample(size = (100000,))) - 2j)
+sample = ((4*np.random.random_sample(size = (75000,))) - 2) + ((4 * 1j * np.random.random_sample(size = (75000,))) - 2j)
 
 # for j in np.linspace(0, 4, 400):
 #     for i in sample:
 #         print(r_func(L, L_con, [0,i,j], [], 0), i, j)
 
-
-# for j in range(6, 400):
+# for j in range(100, 200):
 #     A = np.linspace(.05, 4, 200)
+#     #A = np.linspace(4, 8, 200) # Next
 #     B = [r_Func(0, k, A[j]) for k in sample]
 #     for i in range(0, len(sample)):
-#          #print(i, B[i], sample[i])
 #          if B[i] > 10:
+#              print(i, B[i], sample[i])
 #              if B[i] < 25:
 #                  plt.scatter(sample[i].real, sample[i].imag, s = 1, c = 'blue')
 #              elif B[i] < 100:
