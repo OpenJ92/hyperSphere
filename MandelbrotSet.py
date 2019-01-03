@@ -1,37 +1,35 @@
 import numpy as np
 import matplotlib.pyplot as plt
-
-# incomplete:  how to I introduce an arbitrary amount of parameters to this function
-#   Note that function L has three parameters and by extension, r_func has 3 initial
-#   parameters. Is there a way to specify n parameters in one argument?
+import plotly.offline as offline
+import plotly.graph_objs as go
 
 L = lambda x, c, pow: (x**pow) + c
-L_con = lambda x: True if np.absolute(x) < 2 else False
+L_con = lambda x, count: True if (np.absolute(x)) < 2 and (count < 500) else False
 
-def r_Func(x, c, pow, func = L, con_func = L_con, count = 0):
-    func_val = func(x, c, pow)
-    if (con_func(func_val)) and (count < 500):
-        count += 1
-        return r_Func(func_val, c, pow, func, con_func, count)
-    else:
-        return count
 
-# generalized to arbitrary amount of parameters
-
-def r_func(_, _con, _param, _con_param, count):
+def r_func(_, _con, _param, _con_param):
     func_val = _(*_param)
-    if (_con(func_val, *_con_param)) and (count < 500):
-        count += 1
+    if _con(func_val, *_con_param):
+        _con_param[-1] += 1
         _param[0] = func_val
-        return r_func( _, _con, _param, _con_param, count)
+        return r_func(_, _con, _param, _con_param)
     else:
-        return count
+        return _con_param[-1]
+
+def plot_complex(complex):
+    return plt.scatter(complex.real, complex.imag, c = 'blue')
 
 sample = ((4*np.random.random_sample(size = (75000,))) - 2) + ((4 * 1j * np.random.random_sample(size = (75000,))) - 2j)
 
+# r = []
 # for j in np.linspace(0, 4, 400):
+#     q = []
 #     for i in sample:
-#         print(r_func(L, L_con, [0,i,j], [], 0), i, j)
+#         B = r_func(L, L_con, [0,i,j], [0])
+#         q.append(B)
+#     r.append(q)
+
+# A = np.array(r)
 
 # for j in range(100, 200):
 #     A = np.linspace(.05, 4, 200)
@@ -50,3 +48,12 @@ sample = ((4*np.random.random_sample(size = (75000,))) - 2) + ((4 * 1j * np.rand
 #     plt.axis([-2, 2, -2, 2])
 #     plt.savefig(str(j) + '.jpeg')
 #     plt.close()
+
+
+# def r_Func(x, c, pow, func = L, con_func = L_con, count = 0):
+#     func_val = func(x, c, pow)
+#     if (con_func(func_val)) and (count < 500):
+#         count += 1
+#         return r_Func(func_val, c, pow, func, con_func, count)
+#     else:
+#         return count
