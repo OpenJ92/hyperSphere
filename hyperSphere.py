@@ -36,7 +36,6 @@ from functools import reduce
 c = lambda x, theta: np.append(np.cos(theta)*x, np.sin(theta))
 
 def hyperSphere(theta):
-    print(theta)
     _ = c(1, theta[0])
     for i in theta[1:]:
         _ = c(_, i)
@@ -51,16 +50,20 @@ def Binary_hyperSphereProduct(_A, _B):
     return q
 
 def hyperSphereProduct(theta):
+    import pdb; pdb.set_trace()
     input_ = [hyperSphere(domain) for domain in theta]
     return reduce((lambda x, y: Binary_hyperSphereProduct(x, y)), input_)
 
 def L(Domain_):
     if len(Domain_) == 2:
         return np.array([Domain_[0]], [Domain_[1]])
-    hyperSphereProductDomain_ = [[Domain_[element], Domain_[element + 1]] for element in 2 * np.array(range(0, int(len(Domain_) / 2)))]
+    # hyperSphereProductDomain_ = [[Domain_[element], Domain_[element + 1]] for element in 2 * np.array(range(0, int(len(Domain_) / 2)))]
+    hyperSphereProductDomain_ = []
+    for element in 2 * np.array(range(0, int(len(Domain_) / 2))):
+        hyperSphereProductDomain_.append([Domain_[element], Domain_[element + 1]])
     if len(Domain_) % 2 == 1:
-        hyperSphereProductDomain_.insert(0, [Domain_[-1]])
-    return hyperSphereProductDomain_
+        hyperSphereProductDomain_.insert(0, [[Domain_[-1]], 0]) # use np.insert https://docs.scipy.org/doc/numpy-1.15.0/reference/generated/numpy.insert.html
+    return np.array(hyperSphereProductDomain_)
 
 def q(hyperSphereProductDomain_, num_samples = 10000, learning_rate = .01):
     hyperSphereProduct_ = hyperSphereProduct(hyperSphereProductDomain_)
@@ -118,8 +121,7 @@ def checkContinuity_hyperSphereProduct(dim, samples):
     domain_hyperSphereProduct_adj = np.apply_along_axis(L, 1, domain_hyperSphereProduct)
     domain_hyperSphereProduct_Ball_adj = np.apply_along_axis(L, 2, domain_hyperSphereProduct_Ball)
     import pdb; pdb.set_trace()
-    ## NOTE: this currently doesn't work with odd numbers. Look into why this is not working. There seems to be a problem
-    ##          with how domain_hyperSphereProduct_Ball_adj is stored. There's a distinction in how they're stored provided
+    ## NOTE: this currently doesn't work with odd numbers. Look into why this is not working. There's a distinction in how they're stored provided
     ##          the input dim is even or odd.
     ##                              Doesn't work for dim = {2, 3, 4, 5, 6, }
     range_hyperSphereProduct = np.apply_along_axis(hyperSphereProduct, 1, domain_hyperSphereProduct_adj)
