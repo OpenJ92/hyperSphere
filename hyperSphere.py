@@ -50,7 +50,6 @@ def Binary_hyperSphereProduct(_A, _B):
     return q
 
 def hyperSphereProduct(theta):
-    import pdb; pdb.set_trace()
     input_ = [hyperSphere(domain) for domain in theta]
     return reduce((lambda x, y: Binary_hyperSphereProduct(x, y)), input_)
 
@@ -62,7 +61,7 @@ def L(Domain_):
     for element in 2 * np.array(range(0, int(len(Domain_) / 2))):
         hyperSphereProductDomain_.append([Domain_[element], Domain_[element + 1]])
     if len(Domain_) % 2 == 1:
-        hyperSphereProductDomain_.insert(0, [[Domain_[-1]], 0]) # use np.insert https://docs.scipy.org/doc/numpy-1.15.0/reference/generated/numpy.insert.html
+        hyperSphereProductDomain_.insert(0, [Domain_[-1], 0]) # use np.insert https://docs.scipy.org/doc/numpy-1.15.0/reference/generated/numpy.insert.html
     return np.array(hyperSphereProductDomain_)
 
 def q(hyperSphereProductDomain_, num_samples = 10000, learning_rate = .01):
@@ -120,13 +119,25 @@ def checkContinuity_hyperSphereProduct(dim, samples):
     domain_hyperSphereProduct_Ball = np.apply_along_axis(sphereAboutAPoint, 1, domain_hyperSphereProduct)
     domain_hyperSphereProduct_adj = np.apply_along_axis(L, 1, domain_hyperSphereProduct)
     domain_hyperSphereProduct_Ball_adj = np.apply_along_axis(L, 2, domain_hyperSphereProduct_Ball)
+
+    range_hyperSphereProduct = np.ndarray(shape = (domain_hyperSphereProduct_adj.shape[0],dim))
+    for i in range(domain_hyperSphereProduct_adj.shape[0]):
+        import pdb; pdb.set_trace()
+        range_hyperSphereProduct[i] = hyperSphereProduct(domain_hyperSphereProduct_adj[i])
+
+    range_hyperSphereProduct_Ball = np.ndarray(shape = (domain_hyperSphereProduct_adj.shape[0], 400, dim))
+    for i in range(domain_hyperSphereProduct_Ball_adj.shape[0]):
+        for j in range(domain_hyperSphereProduct_Ball_adj.shape[1]):
+            range_hyperSphereProduct_Ball[i,j] = hyperSphereProduct(domain_hyperSphereProduct_Ball_adj[i,j])
+
+    norms_ = np.ndarray(shape = (range_hyperSphereProduct.shape[0],400))
+    for i in range(range_hyperSphereProduct.shape[0]):
+        norms_[i] = np.apply_along_axis(np.linalg.norm, 1, range_hyperSphereProduct_Ball[0] - range_hyperSphereProduct[0])
+
+    # construct a heatmap visualization for this. take a closer look at the difference between the even and odd cases
+    # and look to implement a means to control the number of samples you take about the initial samples. Note: even not working.
     import pdb; pdb.set_trace()
-    ## NOTE: this currently doesn't work with odd numbers. Look into why this is not working. There's a distinction in how they're stored provided
-    ##          the input dim is even or odd.
-    ##                              Doesn't work for dim = {2, 3, 4, 5, 6, }
-    range_hyperSphereProduct = np.apply_along_axis(hyperSphereProduct, 1, domain_hyperSphereProduct_adj)
-    range_hyperSphereProduct_Ball = np.apply_along_axis(hyperSphereProduct, 2, domain_hyperSphereProduct_Ball_adj)
-    import pdb; pdb.set_trace()
+
 
 def hyperSphereTest(dimension, numTests):
     sample = 2 * np.pi * np.random.random_sample(size = (numTests, dimension))
@@ -140,3 +151,7 @@ def hyperSpherePoly(dimension, numTests, domainSample, domainRange): # returns n
     sample = np.apply_along_axis((lambda x: hyperSphere(x)), 1, sample)
     domain = np.linspace(*domainRange, domainSample)
     return np.apply_along_axis((lambda x: [domain, sigma(domain, x)]), 1, sample)
+
+def _print(*a):
+    print('here', a[1])
+    import pdb; pdb.set_trace()
