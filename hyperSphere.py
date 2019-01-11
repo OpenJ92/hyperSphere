@@ -55,8 +55,7 @@ def hyperSphereProduct(theta):
 
 def L(Domain_):
     if len(Domain_) == 2:
-        return np.array([Domain_[0]], [Domain_[1]])
-    # hyperSphereProductDomain_ = [[Domain_[element], Domain_[element + 1]] for element in 2 * np.array(range(0, int(len(Domain_) / 2)))]
+        return [[Domain_[0]], [Domain_[1]]]
     hyperSphereProductDomain_ = []
     for element in 2 * np.array(range(0, int(len(Domain_) / 2))):
         hyperSphereProductDomain_.append([Domain_[element], Domain_[element + 1]])
@@ -111,31 +110,36 @@ def sphereAboutAPoint(domain_, ball = True):
     subdomain_Sample = 2 * np.pi * np.random.random_sample(size = (400, dim - 1))
     domain_Sample = np.apply_along_axis(hyperSphere, 1, subdomain_Sample)
     if ball:
-        domain_Sample = np.apply_along_axis((lambda x: (.001) * np.random.random_sample()*x), 1, domain_Sample)
+        domain_Sample = np.apply_along_axis((lambda x: (.001)*np.random.random_sample()*x), 1, domain_Sample)
     return domain_ + domain_Sample
 
 def checkContinuity_hyperSphereProduct(dim, samples):
     domain_hyperSphereProduct = 2 * np.pi * np.random.random_sample(size = (samples, dim - 1))
     domain_hyperSphereProduct_Ball = np.apply_along_axis(sphereAboutAPoint, 1, domain_hyperSphereProduct)
+    import pdb; pdb.set_trace()
     domain_hyperSphereProduct_adj = np.apply_along_axis(L, 1, domain_hyperSphereProduct)
     domain_hyperSphereProduct_Ball_adj = np.apply_along_axis(L, 2, domain_hyperSphereProduct_Ball)
 
     range_hyperSphereProduct = np.ndarray(shape = (domain_hyperSphereProduct_adj.shape[0],dim))
     for i in range(domain_hyperSphereProduct_adj.shape[0]):
-        import pdb; pdb.set_trace()
-        range_hyperSphereProduct[i] = hyperSphereProduct(domain_hyperSphereProduct_adj[i])
+        hSP = hyperSphereProduct(domain_hyperSphereProduct_adj[i])[:-1] if dim % 2 == 0 else hyperSphereProduct(domain_hyperSphereProduct_adj[i])
+        range_hyperSphereProduct[i] = hSP
 
     range_hyperSphereProduct_Ball = np.ndarray(shape = (domain_hyperSphereProduct_adj.shape[0], 400, dim))
     for i in range(domain_hyperSphereProduct_Ball_adj.shape[0]):
         for j in range(domain_hyperSphereProduct_Ball_adj.shape[1]):
-            range_hyperSphereProduct_Ball[i,j] = hyperSphereProduct(domain_hyperSphereProduct_Ball_adj[i,j])
+            hSP = hyperSphereProduct(domain_hyperSphereProduct_Ball_adj[i,j])[:-1] if dim % 2 == 0 else hyperSphereProduct(domain_hyperSphereProduct_Ball_adj[i,j])
+            range_hyperSphereProduct_Ball[i,j] = hSP
 
     norms_ = np.ndarray(shape = (range_hyperSphereProduct.shape[0],400))
     for i in range(range_hyperSphereProduct.shape[0]):
-        norms_[i] = np.apply_along_axis(np.linalg.norm, 1, range_hyperSphereProduct_Ball[0] - range_hyperSphereProduct[0])
+        print(range_hyperSphereProduct_Ball[i] - range_hyperSphereProduct[i])
+        norms_[i] = np.apply_along_axis(np.linalg.norm, 1, range_hyperSphereProduct_Ball[i] - range_hyperSphereProduct[i])
 
     # construct a heatmap visualization for this. take a closer look at the difference between the even and odd cases
-    # and look to implement a means to control the number of samples you take about the initial samples. Note: even not working.
+    # and look to implement a means to control the number of samples you take about the initial samples.
+    # This seeems to be working. look to implement a heatmap function onto the norms_ array to study. Then justify each
+    # function written in a LaTeX paper for the code writtien. Consider what we should fo next.
     import pdb; pdb.set_trace()
 
 
@@ -144,6 +148,10 @@ def hyperSphereTest(dimension, numTests):
     sample = np.apply_along_axis((lambda x: hyperSphere(x)), 1, sample)
     return np.apply_along_axis((lambda x: np.linalg.norm(x)), 1, sample)
 
+#|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+#|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||polynomial
+#|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
 sigma = lambda x, parameters: reduce((lambda y, z: y + z), [parameters[i]*(x**i) for i in range(0, len(parameters))])
 
 def hyperSpherePoly(dimension, numTests, domainSample, domainRange): # returns np.array.shape = (samples, dimension - 1, domainSample)
@@ -151,7 +159,3 @@ def hyperSpherePoly(dimension, numTests, domainSample, domainRange): # returns n
     sample = np.apply_along_axis((lambda x: hyperSphere(x)), 1, sample)
     domain = np.linspace(*domainRange, domainSample)
     return np.apply_along_axis((lambda x: [domain, sigma(domain, x)]), 1, sample)
-
-def _print(*a):
-    print('here', a[1])
-    import pdb; pdb.set_trace()
