@@ -49,8 +49,10 @@ def Binary_hyperSphereProduct(_A, _B):
             q[i+j] += c[i][j]
     return q
 
-def hyperSphereProduct(theta):
-    input_ = [hyperSphere(domain) for domain in theta]
+def hyperSphereProduct(theta): # There should be a kwarg for the shifted sphere, Notice that there's a section where
+                               # it may be questionable to use hSP on the Ball samples. Upon further inspection this
+                               # may not be the case.
+    input_ = [hyperSphere(domain) + np.array([1 if i == 0 else 0 for i in range(len(domain)+1)]) for domain in theta]
     return reduce((lambda x, y: Binary_hyperSphereProduct(x, y)), input_)
 
 def L(Domain_):
@@ -60,7 +62,7 @@ def L(Domain_):
     for element in 2 * np.array(range(0, int(len(Domain_) / 2))):
         hyperSphereProductDomain_.append([Domain_[element], Domain_[element + 1]])
     if len(Domain_) % 2 == 1:
-        hyperSphereProductDomain_.insert(0, [Domain_[-1], 0]) # use np.insert https://docs.scipy.org/doc/numpy-1.15.0/reference/generated/numpy.insert.html
+        hyperSphereProductDomain_.insert(0, [Domain_[-1], 0])
     return np.array(hyperSphereProductDomain_)
 
 def q(hyperSphereProductDomain_, num_samples = 10000, learning_rate = .01):
@@ -82,6 +84,7 @@ def q(hyperSphereProductDomain_, num_samples = 10000, learning_rate = .01):
         A = np.apply_along_axis(hyperSphere, 1, domain_hyperSphere_Sample_global)
         B = A @ hyperSphereProduct_
         if (hyperSphere(argmaxinnerProduct) @ hyperSphereProduct_) < B[np.argmax(B)]:
+            print(hyperSphere(argmaxinnerProduct) @ hyperSphereProduct_)
             argmaxinnerProduct = domain_hyperSphere_Sample_global[np.argmax(B)]
             w = 0
         else:
@@ -92,18 +95,20 @@ def q(hyperSphereProductDomain_, num_samples = 10000, learning_rate = .01):
 def testq(num_, dimension_):
     samp = np.random.random_sample(size = (num_, dimension_))
     samp_A = np.apply_along_axis(L, 1, samp)
-    samp_B = np.apply_along_axis(q, 1, samp_A)
+    import pdb; pdb.set_trace()
+    samp_B = [q(samp_A[i]) for i in range(samp_A.shape[0])]
+    #samp_B = np.apply_along_axis(q, 1, samp_A)
     return samp_B
 
-def M(dim, samples):
-    domain_hyperSphereProduct = 2 * np.pi * np.random.random_sample(size = (samples, dim - 1))
-    domain_hyperSphereProduct_adj = np.apply_along_axis(L, 1, domain_hyperSphereProduct)
-    domain_hyperSphere = 2 * np.pi * np.random.random_sample(size = (samples, dim - 1))
-
-    range_hyperSphereProduct = np.apply_along_axis(hyperSphereProduct, 1, domain_hyperSphereProduct_adj)
-    range_hyperSphere = np.apply_along_axis(hyperSphere, 1, domain_hyperSphere)
-
-    return range_hyperSphere @ range_hyperSphereProduct.T
+# def M(dim, samples):
+#     domain_hyperSphereProduct = 2 * np.pi * np.random.random_sample(size = (samples, dim - 1))
+#     domain_hyperSphereProduct_adj = np.apply_along_axis(L, 1, domain_hyperSphereProduct)
+#     domain_hyperSphere = 2 * np.pi * np.random.random_sample(size = (samples, dim - 1))
+#
+#     range_hyperSphereProduct = np.apply_along_axis(hyperSphereProduct, 1, domain_hyperSphereProduct_adj)
+#     range_hyperSphere = np.apply_along_axis(hyperSphere, 1, domain_hyperSphere)
+#
+#     return range_hyperSphere @ range_hyperSphereProduct.T
 
 def sphereAboutAPoint(domain_, ball = True):
     dim = domain_.shape[0]
@@ -122,6 +127,7 @@ def checkContinuity_hyperSphereProduct(dim, samples):
 
     range_hyperSphereProduct = np.ndarray(shape = (domain_hyperSphereProduct_adj.shape[0],dim))
     for i in range(domain_hyperSphereProduct_adj.shape[0]):
+        # come back here and justify hSP cmoputation. I'm not sure if this is doing exactly as I expected it.
         hSP = hyperSphereProduct(domain_hyperSphereProduct_adj[i])[:-1] if dim % 2 == 0 else hyperSphereProduct(domain_hyperSphereProduct_adj[i])
         range_hyperSphereProduct[i] = hSP
 
@@ -135,6 +141,12 @@ def checkContinuity_hyperSphereProduct(dim, samples):
     for i in range(range_hyperSphereProduct.shape[0]):
         print(range_hyperSphereProduct_Ball[i] - range_hyperSphereProduct[i])
         norms_[i] = np.apply_along_axis(np.linalg.norm, 1, range_hyperSphereProduct_Ball[i] - range_hyperSphereProduct[i])
+
+    # it looks like you missed a step here. (Tomorrow, explain to yourself exactly what
+    #                                            you're trying to do with this function.)
+    # perhaps a name change to domain_hyperSphereProduct and domain_hyperSphereProduct_Ball to
+    #                           domain_hyperSphere and domain_hyperSphere_Ball will work to clarify.
+    # remember it's subDomain (hyperSphere domain) -> Domain (hyperSpheres) -> Range (hyperSphereProduct)
 
     # construct a heatmap visualization for this. take a closer look at the difference between the even and odd cases
     # and look to implement a means to control the number of samples you take about the initial samples.
